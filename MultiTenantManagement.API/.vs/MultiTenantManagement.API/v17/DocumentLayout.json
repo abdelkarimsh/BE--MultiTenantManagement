@@ -1,0 +1,405 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\web\\MultiTenantManagement.API\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.api\\controllers\\tenantscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|solutionrelative:multitenantmanagement.api\\controllers\\tenantscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.infrastructure\\features\\tenant\\tenantservice .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|solutionrelative:multitenantmanagement.infrastructure\\features\\tenant\\tenantservice .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114113913_Tenant-makeNoticeNUllable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MultiTenantManagement.Data\\Migrations\\20260114113913_Tenant-makeNoticeNUllable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.data\\models\\tenant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|solutionrelative:multitenantmanagement.data\\models\\tenant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.data\\multitenantmanagement.data.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|solutionrelative:multitenantmanagement.data\\multitenantmanagement.data.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.api\\multitenantmanagement.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|solutionrelative:multitenantmanagement.api\\multitenantmanagement.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.data\\migrations\\20260114111836_addingtenant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|solutionrelative:multitenantmanagement.data\\migrations\\20260114111836_addingtenant.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.data\\migrations\\appdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|solutionrelative:multitenantmanagement.data\\migrations\\appdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|solutionrelative:multitenantmanagement.data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.infrastructure\\features\\tenant\\dtos\\createtenantrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|solutionrelative:multitenantmanagement.infrastructure\\features\\tenant\\dtos\\createtenantrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|solutionrelative:multitenantmanagement.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.infrastructure\\features\\tenant\\itenantservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|solutionrelative:multitenantmanagement.infrastructure\\features\\tenant\\itenantservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.infrastructure\\features\\tenant\\dtos\\tenantdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|solutionrelative:multitenantmanagement.infrastructure\\features\\tenant\\dtos\\tenantdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.infrastructure\\features\\tenant\\dtos\\updatetenantrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{62EF73DA-59DC-43FB-9301-7486111C8D3C}|MultiTenantManagement.Infrastructure\\MultiTenantManagement.Infrastructure.csproj|solutionrelative:multitenantmanagement.infrastructure\\features\\tenant\\dtos\\updatetenantrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.data\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40D6424A-4263-4E96-9CCD-34BEE213F9F7}|MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj|solutionrelative:multitenantmanagement.data\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|c:\\web\\multitenantmanagement.api\\multitenantmanagement.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{59AECEF1-9D28-48F5-89AE-F0832FE53C5B}|MultiTenantManagement.API\\MultiTenantManagement.API.csproj|solutionrelative:multitenantmanagement.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114103732_InitIdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MultiTenantManagement.Data\\Migrations\\20260114103732_InitIdentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 27,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:139:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:145:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:150:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:154:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:156:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:155:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:155:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:153:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:152:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:151:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:161:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:163:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:164:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:160:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:162:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:165:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:167:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:153:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:154:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:156:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:157:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:158:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:160:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "20260114113913_Tenant-makeNoticeNUllable.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114113913_Tenant-makeNoticeNUllable.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\Migrations\\20260114113913_Tenant-makeNoticeNUllable.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114113913_Tenant-makeNoticeNUllable.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\Migrations\\20260114113913_Tenant-makeNoticeNUllable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:39:13.988Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MultiTenantManagement.Data",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj",
+              "RelativeToolTip": "MultiTenantManagement.Data\\MultiTenantManagement.Data.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-14T11:37:25.271Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AppDbContextModelSnapshot.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\AppDbContextModelSnapshot.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\Migrations\\AppDbContextModelSnapshot.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\AppDbContextModelSnapshot.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\Migrations\\AppDbContextModelSnapshot.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:34:32.508Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TenantsController.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\Controllers\\TenantsController.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.API\\Controllers\\TenantsController.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\Controllers\\TenantsController.cs",
+              "RelativeToolTip": "MultiTenantManagement.API\\Controllers\\TenantsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:20:14.827Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "20260114111836_AddingTenant.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114111836_AddingTenant.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\Migrations\\20260114111836_AddingTenant.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114111836_AddingTenant.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\Migrations\\20260114111836_AddingTenant.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAACIAAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:18:36.255Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "UpdateTenantRequestDto.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\UpdateTenantRequestDto.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\UpdateTenantRequestDto.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\UpdateTenantRequestDto.cs",
+              "RelativeToolTip": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\UpdateTenantRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:13:19.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CreateTenantRequestDto.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\CreateTenantRequestDto.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\CreateTenantRequestDto.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\CreateTenantRequestDto.cs",
+              "RelativeToolTip": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\CreateTenantRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:06:51.876Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "TenantDto.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\TenantDto.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\TenantDto.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\TenantDto.cs",
+              "RelativeToolTip": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\Dtos\\TenantDto.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAuwA4AAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:02:02.794Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TenantService .cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\TenantService .cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\TenantService .cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\TenantService .cs",
+              "RelativeToolTip": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\TenantService .cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAwBwAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:00:40.354Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ITenantService.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\ITenantService.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\ITenantService.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Infrastructure\\Features\\Tenant\\ITenantService.cs",
+              "RelativeToolTip": "MultiTenantManagement.Infrastructure\\Features\\Tenant\\ITenantService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T11:00:26.505Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Tenant.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Models\\Tenant.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\Models\\Tenant.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Models\\Tenant.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\Models\\Tenant.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAswBMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T10:41:36.572Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "20260114103732_InitIdentity.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114103732_InitIdentity.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\Migrations\\20260114103732_InitIdentity.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Migrations\\20260114103732_InitIdentity.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\Migrations\\20260114103732_InitIdentity.cs",
+              "ViewState": "AgIAAL0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T10:37:32.863Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MultiTenantManagement.API",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\MultiTenantManagement.API.csproj",
+              "RelativeDocumentMoniker": "MultiTenantManagement.API\\MultiTenantManagement.API.csproj",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\MultiTenantManagement.API.csproj",
+              "RelativeToolTip": "MultiTenantManagement.API\\MultiTenantManagement.API.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-14T10:08:41.472Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\appsettings.json",
+              "RelativeDocumentMoniker": "MultiTenantManagement.API\\appsettings.json",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\appsettings.json",
+              "RelativeToolTip": "MultiTenantManagement.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-14T10:10:22.315Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\Program.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.API\\Program.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.API\\Program.cs",
+              "RelativeToolTip": "MultiTenantManagement.API\\Program.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAAAAADcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T10:08:44.615Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Models\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\Models\\ApplicationUser.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\Models\\ApplicationUser.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\Models\\ApplicationUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T10:08:28.309Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "MultiTenantManagement.Data\\AppDbContext.cs",
+              "ToolTip": "C:\\web\\MultiTenantManagement.API\\MultiTenantManagement.Data\\AppDbContext.cs",
+              "RelativeToolTip": "MultiTenantManagement.Data\\AppDbContext.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T10:07:56.012Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
