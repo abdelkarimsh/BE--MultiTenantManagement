@@ -4,6 +4,7 @@ public class Product
 {
     public Guid Id { get; init; } =  Guid.NewGuid();
     public Guid TenantId { get; init; }
+    public Guid? AttachmentId { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; }
@@ -14,5 +15,6 @@ public class Product
     public bool IsDeleted { get; set; }
 
     public Tenant? Tenant { get; init; }
+    public Attachment? Attachment { get; set; }
     public ICollection<OrderItems> OrderItems { get; init; } = new List<OrderItems>();
 }

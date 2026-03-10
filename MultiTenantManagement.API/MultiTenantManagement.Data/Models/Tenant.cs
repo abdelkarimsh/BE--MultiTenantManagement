@@ -19,6 +19,8 @@ namespace MultiTenantManagement.Data.Models
         [MaxLength(256)]
         public string? LogoUrl { get; set; }
 
+        public Guid? AttachmentId { get; set; }
+
         [Required, MaxLength(250)]
         public required string SubDomain { get; set; } 
 
@@ -27,5 +29,6 @@ namespace MultiTenantManagement.Data.Models
         public ICollection<Product> Products { get; init; } = new List<Product>();
         public ICollection<Order> Orders { get; init; } = new List<Order>();
         public StoreSetting? StoreSetting { get; set; }
+        public Attachment? Attachment { get; set; }
     }
 }

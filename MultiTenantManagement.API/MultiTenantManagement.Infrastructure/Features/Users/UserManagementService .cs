@@ -97,7 +97,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Users
         public async Task<bool> UpdateUserAsync(string userId, UpdateUserDto req, string actorUserId, CancellationToken ct)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return false;
+            if (user is null || user.IsDeleted) return false;
 
             user.PhoneNumber = req.PhoneNumber ?? user.PhoneNumber;
 
@@ -125,7 +125,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Users
         public async Task<bool> SoftDeleteAsync(string userId, string actorUserId, CancellationToken ct)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return false;
+            if (user is null || user.IsDeleted) return false;
 
             user.IsDeleted = true;
             var res = await _userManager.UpdateAsync(user);

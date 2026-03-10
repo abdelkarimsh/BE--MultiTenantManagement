@@ -19,6 +19,8 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant.Dtos
 
         public string? LogoURL { get; set; }
 
+        public Guid? AttachmentId { get; set; }
+
         public StoreSettingDto? StoreSetting { get; set; }
 
     }

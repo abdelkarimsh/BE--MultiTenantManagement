@@ -21,6 +21,7 @@ namespace MultiTenantManagement.Data
 
         public DbSet<Tenant> Tenants => Set<Tenant>();
         public DbSet<Product> Products => Set<Product>();
+        public DbSet<Attachment> Attachments => Set<Attachment>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItems> OrderItems => Set<OrderItems>();
         public DbSet<Payment> Payments => Set<Payment>();
@@ -53,6 +54,11 @@ namespace MultiTenantManagement.Data
                      .WithMany(t => t.Products)
                      .HasForeignKey(p => p.TenantId)
                      .OnDelete(DeleteBehavior.Restrict);
+
+                    e.HasOne(p => p.Attachment)
+                     .WithMany()
+                     .HasForeignKey(p => p.AttachmentId)
+                     .OnDelete(DeleteBehavior.SetNull);
                 });
 
                 builder.Entity<Order>(e =>
@@ -87,6 +93,28 @@ namespace MultiTenantManagement.Data
                      .WithOne(t => t.StoreSetting)
                      .HasForeignKey<StoreSetting>(s => s.TenantId)
                      .OnDelete(DeleteBehavior.Cascade);
+                });
+
+                builder.Entity<Tenant>(e =>
+                {
+                    e.HasOne(t => t.Attachment)
+                     .WithMany()
+                     .HasForeignKey(t => t.AttachmentId)
+                     .OnDelete(DeleteBehavior.SetNull);
+                });
+
+                builder.Entity<Attachment>(e =>
+                {
+                    e.Property(x => x.OriginalFileName).HasMaxLength(255).IsRequired();
+                    e.Property(x => x.TenantId).IsRequired();
+                    e.Property(x => x.StoredFileName).HasMaxLength(255).IsRequired();
+                    e.Property(x => x.FileKey).HasMaxLength(1024).IsRequired();
+                    e.Property(x => x.StorageProvider).HasMaxLength(50).IsRequired();
+                    e.Property(x => x.ContentType).HasMaxLength(150).IsRequired();
+                    e.Property(x => x.Category).HasMaxLength(100).IsRequired();
+                    e.Property(x => x.EntityType).HasMaxLength(100).IsRequired();
+                    e.Property(x => x.EntityId).HasMaxLength(100).IsRequired();
+                    e.HasIndex(x => x.TenantId);
                 });
 
 

@@ -10,7 +10,10 @@ namespace MultiTenantManagement.Infrastructure.Mapper
     {
         public MappingProfile()
         {
-            CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<Product, ProductDto>()
+                .ForMember(dest => dest.AttachmentUrl, opt => opt.MapFrom(src => src.Attachment != null ? src.Attachment.FileKey : null))
+                .ReverseMap()
+                .ForMember(dest => dest.Attachment, opt => opt.Ignore());
             CreateMap<CreateProductDto, Product>()
                  .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAtUtc, opt => opt.Ignore());
@@ -23,7 +26,11 @@ namespace MultiTenantManagement.Infrastructure.Mapper
 
             CreateMap<CreateTenantRequestDto, Tenant>();
             CreateMap<  UpdateTenantRequestDto, Tenant>();
-            CreateMap<TenantDto, Tenant>().ReverseMap();
+            CreateMap<TenantDto, Tenant>()
+                .ForMember(dest => dest.Attachment, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(dest => dest.AttachmentUrl, opt => opt.MapFrom(src => src.Attachment != null ? src.Attachment.FileKey : null))
+                .ForMember(dest => dest.LogoURL, opt => opt.MapFrom(src => src.Attachment != null ? src.Attachment.FileKey : src.LogoUrl));
             CreateMap<StoreSetting, StoreSettingDto>().ReverseMap();
             
         }

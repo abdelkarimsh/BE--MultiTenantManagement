@@ -17,6 +17,8 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant.Dtos
         public string Status { get; set; }
 
         public string? LogoURL { get; set; }
+        public Guid? AttachmentId { get; set; }
+        public string? AttachmentUrl { get; set; }
 
         public string SubDomain { get; set; }
 

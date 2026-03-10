@@ -98,7 +98,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Product
         {
             var entity = await _dbContext.Products
                 .AsNoTracking()
-                .FirstOrDefaultAsync(p => tenantId == p.TenantId && p.Id == id );
+                .FirstOrDefaultAsync(p => tenantId == p.TenantId && p.Id == id && !p.IsDeleted);
 
             if (entity is null)
                 return null;
@@ -131,7 +131,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Product
             dto.TenantId = tenantId;
             dto.Id = id;
             var existing = await _dbContext.Products
-                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+                .FirstOrDefaultAsync(p => p.Id == id && p.TenantId == tenantId && !p.IsDeleted);
 
             if (existing is null)
                 return false;
@@ -152,7 +152,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Product
 
 
             var existing = await _dbContext.Products
-                .FirstOrDefaultAsync(p => p.Id == id && p.TenantId == tenantId);
+                .FirstOrDefaultAsync(p => p.Id == id && p.TenantId == tenantId && !p.IsDeleted);
 
                     if (existing is null)
                         return false;

@@ -16,6 +16,10 @@ using MultiTenantManagement.Infrastructure.Mapper;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using MultiTenantManagement.Infrastructure.Auth;
+using MultiTenantManagement.Infrastructure.Features.Attachment;
+using MultiTenantManagement.Infrastructure.Storage;
+using Amazon;
+using Amazon.S3;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +29,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
 
 // DbContext (PostgreSQL)
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -88,6 +93,28 @@ builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.Configure<AttachmentOptions>(builder.Configuration.GetSection(AttachmentOptions.SectionName));
+builder.Services.Configure<S3StorageSettings>(builder.Configuration.GetSection(S3StorageSettings.SectionName));
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var settings = builder.Configuration.GetSection(S3StorageSettings.SectionName).Get<S3StorageSettings>()
+                   ?? throw new InvalidOperationException("Missing S3 storage configuration.");
+
+    if (string.IsNullOrWhiteSpace(settings.BucketName) ||
+        string.IsNullOrWhiteSpace(settings.Region) ||
+        string.IsNullOrWhiteSpace(settings.AccessKey) ||
+        string.IsNullOrWhiteSpace(settings.SecretKey))
+    {
+        throw new InvalidOperationException("S3 storage configuration is invalid.");
+    }
+
+    return new AmazonS3Client(
+        settings.AccessKey,
+        settings.SecretKey,
+        RegionEndpoint.GetBySystemName(settings.Region));
+});
+builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
 
 
 builder.Services.AddSingleton<IAuthorizationHandler, TenantAccessHandler>();

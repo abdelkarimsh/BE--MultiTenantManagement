@@ -11,10 +11,12 @@ namespace MultiTenantManagement.Infrastructure.Features.Product.Dtos
 
         public Guid Id { get; set; }
         public Guid TenantId { get; set; }
+        public Guid? AttachmentId { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public string? ImageUrl { get; set; }
+        public string? AttachmentUrl { get; set; }
         public int? StockQuantity { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAtUtc { get; set; }

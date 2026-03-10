@@ -131,6 +131,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
             tenant.SubDomain = req.SubDomain;
             tenant.Status = req.Status.ToString();
             tenant.LogoUrl = req.LogoURL;
+            tenant.AttachmentId = req.AttachmentId;
 
             await _db.SaveChangesAsync(ct);
             return true;

@@ -12,6 +12,8 @@ namespace MultiTenantManagement.Infrastructure.Features.Product.Dtos
         [Required]
         public Guid TenantId { get; set; }
 
+        public Guid? AttachmentId { get; set; }
+
         [Required]
         [MaxLength(200)]
         public string? Name { get; set; }
