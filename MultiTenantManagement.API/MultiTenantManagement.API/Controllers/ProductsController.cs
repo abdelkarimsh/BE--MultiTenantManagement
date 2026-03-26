@@ -48,6 +48,7 @@ namespace MultiTenantManagement.API.Controllers
         }
 
         // POST: api/products
+        [Authorize(Roles = "TenantAdmin")]
         [HttpPost]
         public async Task<IActionResult> Create(Guid tenantId, [FromBody]  CreateProductDto dto)
         {
@@ -60,6 +61,7 @@ namespace MultiTenantManagement.API.Controllers
         }
 
         // PUT: api/products/{id}
+        [Authorize(Roles = "TenantAdmin")]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid tenantId, Guid id, [FromBody] UpdateProductDto dto)
         {
@@ -74,6 +76,7 @@ namespace MultiTenantManagement.API.Controllers
         }
 
         // DELETE: api/products/{id}
+        [Authorize(Roles = "TenantAdmin")]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid tenantId,Guid id)
         {

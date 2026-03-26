@@ -6,9 +6,8 @@ using MultiTenantManagement.Infrastructure.Features.Attachment.Dtos;
 
 namespace MultiTenantManagement.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("api/tenants/{tenantId}/Attachments")]
+    [Authorize(Policy = "TenantAccess", Roles = "SystemAdmin,TenantAdmin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AttachmentsController : ControllerBase
     {
         private readonly IAttachmentService _attachmentService;
