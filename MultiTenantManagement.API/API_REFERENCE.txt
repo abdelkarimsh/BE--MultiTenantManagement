@@ -1,0 +1,1003 @@
+MultiTenantManagement.API - Frontend API Reference
+Generated from implementation (controllers + services + DTOs + auth handlers)
+
+============================================================
+MODULE: Authentication
+============================================================
+
+------------------------------------------------------------
+ENDPOINT: POST /api/Authentication/Login
+------------------------------------------------------------
+Purpose:
+- Login and return JWT + user context.
+
+Authentication:
+- Required: No
+- Scheme: None
+- Roles: None
+- Policies: None
+- Claims: None
+- Tenant Rules: Not clearly enforced in endpoint; tenant is taken from user account.
+
+Request:
+- Path Params: None
+- Query Params: None
+- Headers: Content-Type: application/json
+- Body DTO: LoginDto
+- Payload:
+{
+  "email": "string (required, email)",
+  "password": "string (required)"
+}
+
+Response:
+- Success: 200 OK
+- Errors:
+  - 400 (model validation)
+  - 500 (invalid credentials currently throw UnauthorizedAccessException in service; not explicitly mapped in controller)
+- Success body (LoginResultDto):
+{
+  "accessToken": "string",
+  "expiresAtUtc": "datetime",
+  "email": "string",
+  "userRole": "string|null",
+  "tenantId": "guid|null",
+  "fullName": "string|null"
+}
+- Error body: framework default / validation problem details
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: LoginRequest, LoginResponse
+- Handle non-200 as login failure.
+- Bad credentials are not clearly returned as 401 in this controller.
+
+Usage Example:
+- Request:
+  POST /api/Authentication/Login
+  Content-Type: application/json
+- Payload:
+{
+  "email": "admin@system.com",
+  "password": "Admin@12345"
+}
+- Success:
+{
+  "accessToken": "eyJ...",
+  "expiresAtUtc": "2026-04-04T13:00:00Z",
+  "email": "admin@system.com",
+  "userRole": "SystemAdmin",
+  "tenantId": null,
+  "fullName": null
+}
+- Error:
+{
+  "status": 500
+}
+
+------------------------------------------------------------
+ENDPOINT: GET /api/Authentication/GetUserTenant
+------------------------------------------------------------
+Purpose:
+- Get current tenant based on authenticated user claim tenant_id.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: None
+- Policies: None
+- Claims: tenant_id used by service
+- Tenant Rules: Claim-driven
+
+Request:
+- Path Params: None
+- Query Params: None
+- Headers: Authorization: Bearer <token>
+- Body DTO: None
+
+Response:
+- Success: 200 OK (TenantDto)
+- Errors: 401, 404
+- Error body:
+"Current tenant was not found."
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: CurrentUserTenantResponse
+- SystemAdmin usually has no tenant_id claim => likely 404.
+
+Usage Example:
+- Request:
+  GET /api/Authentication/GetUserTenant
+  Authorization: Bearer eyJ...
+- Success: TenantDto
+- Error:
+"Current tenant was not found."
+
+
+============================================================
+MODULE: Tenants
+============================================================
+
+------------------------------------------------------------
+ENDPOINT: GET /api/Tenants/GetTenants
+------------------------------------------------------------
+Purpose:
+- Paged tenant listing.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin
+- Policies: SuperAdminOnly
+- Claims: role claim
+- Tenant Rules: System admin endpoint.
+
+Request:
+- Query Params:
+  - pageNumber (default 1)
+  - pageSize (default 10)
+  - sortBy (default "createdAtUtc")
+  - isAscending (default false)
+  - search (optional)
+  - isActive (optional, not clearly enforced in service query)
+- Headers: Authorization
+- Body DTO: None
+
+Response:
+- Success: 200 OK
+- Errors: 401, 403
+- Success body: PagedResult<TenantDto>
+{
+  "items": [TenantDto],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalCount": 0,
+  "totalPages": 0,
+  "hasNext": false,
+  "hasPrevious": false
+}
+- Envelope: No
+- Sorting/filtering: name, createdAtUtc/createdAt, search by name contains
+
+Frontend Notes:
+- Suggested TS interfaces: GetTenantsQuery, PagedResult<TenantDto>
+
+Usage Example:
+GET /api/Tenants/GetTenants?pageNumber=1&pageSize=10&sortBy=name&isAscending=true&search=acme
+
+------------------------------------------------------------
+ENDPOINT: GET /api/Tenants/Tenant/{tenantId}
+------------------------------------------------------------
+Purpose:
+- Get tenant by id.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: TenantAccess
+- Claims: non-SystemAdmin must have tenant_id == route tenantId
+- Tenant Rules: SystemAdmin bypass exists.
+
+Request:
+- Path Params: tenantId (guid)
+- Headers: Authorization
+
+Response:
+- Success: 200 OK (TenantDto)
+- Errors: 401, 403, 404
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: TenantDto
+- TenantAdmin can access own tenant only.
+
+------------------------------------------------------------
+ENDPOINT: POST /api/Tenants/CreateTenant
+------------------------------------------------------------
+Purpose:
+- Create tenant.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin
+- Policies: SuperAdminOnly
+- Claims: role
+- Tenant Rules: System-level only.
+
+Request:
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: CreateTenantRequestDto
+- Payload:
+{
+  "name": "string (required, max 200)",
+  "status": "Active|Disabled",
+  "subDomain": "string (required by model, must be unique in service)",
+  "logoURL": "string|null",
+  "attachmentId": "guid|null",
+  "storeSetting": {
+    "tenantId": "guid|null",
+    "currency": "string (required, max 10)",
+    "theme": "string (required, max 50)",
+    "supportPhone": "string (required, max 30)"
+  }
+}
+
+Response:
+- Success: 200 OK (TenantDto)
+- Errors: 400, 401, 403, 500 (duplicate subdomain currently can surface as unhandled error)
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: CreateTenantRequest, TenantDto
+
+------------------------------------------------------------
+ENDPOINT: PUT /api/Tenants/UpdateTenant/{tenantId}
+------------------------------------------------------------
+Purpose:
+- Update tenant metadata.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: TenantAccess
+- Claims: non-SystemAdmin tenant_id match
+- Tenant Rules: SystemAdmin bypass exists.
+
+Request:
+- Path Params: tenantId (guid)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: UpdateTenantRequestDto
+- Payload:
+{
+  "id": "guid (must match route tenantId)",
+  "name": "string (required, max 200)",
+  "status": "Active|Disabled",
+  "subDomain": "string",
+  "logoURL": "string|null",
+  "attachmentId": "guid|null",
+  "storeSetting": {
+    "tenantId": "guid|null",
+    "currency": "string",
+    "theme": "string",
+    "supportPhone": "string"
+  }
+}
+
+Response:
+- Success: 204 NoContent
+- Errors: 400, 401, 403, 404, 500
+- Known explicit error:
+"Route tenantId does not match request Id."
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: UpdateTenantRequest
+
+------------------------------------------------------------
+ENDPOINT: DELETE /api/Tenants/Tenant/{tenantId}
+------------------------------------------------------------
+Purpose:
+- Soft delete tenant (IsDeleted=true).
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin
+- Policies: SuperAdminOnly
+- Claims: role
+- Tenant Rules: System-level only.
+
+Request:
+- Path Params: tenantId (guid)
+- Headers: Authorization
+
+Response:
+- Success: 204
+- Errors: 401, 403, 404
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: DeleteTenantParams
+
+
+============================================================
+MODULE: Users
+============================================================
+
+------------------------------------------------------------
+ENDPOINT: GET /api/Users/GetUsers
+------------------------------------------------------------
+Purpose:
+- List users; tenant-scoped for TenantAdmin.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: None
+- Claims: TenantAdmin requires tenant_id claim; otherwise Forbid
+- Tenant Rules: TenantAdmin query tenantId is overridden to own tenant.
+
+Request:
+- Query Params: tenantId (guid?)
+- Headers: Authorization
+
+Response:
+- Success: 200 OK (List<UserDto>)
+- Errors: 401, 403
+- Success body item (UserDto):
+{
+  "id": "string",
+  "email": "string",
+  "phoneNumber": "string|null",
+  "tenantId": "guid|null",
+  "roles": ["string"],
+  "tenant": "string|null"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: UserDto, GetUsersQuery
+
+------------------------------------------------------------
+ENDPOINT: GET /api/Users/Users/{userId}
+------------------------------------------------------------
+Purpose:
+- Get user by id.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: None
+- Claims/Tenant Rules:
+  - TenantAdmin needs tenant_id claim.
+  - TenantAdmin can access only users in own tenant.
+
+Request:
+- Path Params: userId (string, ASP.NET Identity user id)
+- Headers: Authorization
+
+Response:
+- Success: 200 OK (UserDto)
+- Errors: 401, 403, 404
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: UserDto
+
+------------------------------------------------------------
+ENDPOINT: POST /api/Users/CreateUser
+------------------------------------------------------------
+Purpose:
+- Create user and assign role.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: None
+- Claims:
+  - NameIdentifier required for actor id
+  - TenantAdmin requires tenant_id
+- Tenant Rules:
+  - TenantAdmin cannot create SystemAdmin
+  - TenantAdmin forces dto.tenantId to own tenant
+
+Request:
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: CreateUserDto
+- Payload:
+{
+  "email": "string (required, email)",
+  "password": "string (required, min length 6)",
+  "phoneNumber": "string|null",
+  "tenantId": "guid|null",
+  "role": "string (required, default User)"
+}
+
+Response:
+- Success: 200 OK (UserDto)
+- Errors: 400, 401, 403, 500
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: CreateUserRequest, UserDto
+
+------------------------------------------------------------
+ENDPOINT: PUT /api/Users/UpdateUser/{userId}
+------------------------------------------------------------
+Purpose:
+- Update user phone, tenant, and/or role.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: None
+- Claims/Tenant Rules:
+  - NameIdentifier required
+  - TenantAdmin: own tenant only, cannot set role SystemAdmin, tenantId forced to own tenant
+
+Request:
+- Path Params: userId (string)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: UpdateUserDto
+- Payload:
+{
+  "phoneNumber": "string|null",
+  "tenantId": "guid|null",
+  "role": "string|null"
+}
+
+Response:
+- Success: 204
+- Errors: 400, 401, 403, 404, 500
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: UpdateUserRequest
+
+------------------------------------------------------------
+ENDPOINT: DELETE /api/Users/DeleteUser/{userId}
+------------------------------------------------------------
+Purpose:
+- Soft delete user (IsDeleted=true).
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: None
+- Claims/Tenant Rules:
+  - NameIdentifier required
+  - TenantAdmin: same tenant only
+
+Request:
+- Path Params: userId (string)
+- Headers: Authorization
+
+Response:
+- Success: 204
+- Errors: 401, 403, 404, 500
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: DeleteUserParams
+
+
+============================================================
+MODULE: Products
+============================================================
+
+------------------------------------------------------------
+ENDPOINT: GET /api/tenants/{tenantId}/products
+------------------------------------------------------------
+Purpose:
+- Public paged products list for a tenant.
+
+Authentication:
+- Required: No ([AllowAnonymous] at action)
+- Scheme: None
+- Roles: None
+- Policies: None
+- Claims: None
+- Tenant Rules: tenant scope from route.
+
+Request:
+- Path Params: tenantId (guid)
+- Query Params:
+  - pageNumber (default 1)
+  - pageSize (default 10)
+  - sortBy (default null)
+  - isAscending (default true)
+  - search (default null)
+
+Response:
+- Success: 200 (PagedResult<ProductDto>)
+- Errors: Not explicitly mapped
+- Success item (ProductDto):
+{
+  "id": "guid",
+  "tenantId": "guid",
+  "attachmentId": "guid|null",
+  "name": "string|null",
+  "description": "string|null",
+  "price": 0,
+  "imageUrl": "string|null",
+  "attachmentUrl": "string|null",
+  "stockQuantity": 0,
+  "isActive": true,
+  "createdAtUtc": "datetime"
+}
+- Envelope: No
+- Sorting/filtering: name, price, createdAtUtc/createdAt, fallback id; search name/description contains
+
+Frontend Notes:
+- Suggested TS interfaces: ProductDto, PagedResult<ProductDto>, GetProductsQuery
+
+------------------------------------------------------------
+ENDPOINT: GET /api/tenants/{tenantId}/products/{id}
+------------------------------------------------------------
+Purpose:
+- Public product details.
+
+Authentication:
+- Required: No
+- Scheme: None
+- Roles: None
+- Policies: None
+- Claims: None
+- Tenant Rules: Tenant-scoped by route.
+
+Request:
+- Path Params: tenantId (guid), id (guid)
+
+Response:
+- Success: 200 (ProductDto)
+- Errors: 404
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: ProductDto
+
+------------------------------------------------------------
+ENDPOINT: POST /api/tenants/{tenantId}/products
+------------------------------------------------------------
+Purpose:
+- Create product.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: TenantAdmin
+- Policies: TenantAccess
+- Claims: tenant_id match required for non-SystemAdmin
+- Tenant Rules:
+  - SystemAdmin bypass exists in policy, but action role requires TenantAdmin.
+
+Request:
+- Path Params: tenantId (guid)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: CreateProductDto
+- Payload:
+{
+  "tenantId": "guid (required in DTO, overwritten from route in service)",
+  "attachmentId": "guid|null",
+  "name": "string (required, max 200)",
+  "description": "string|null",
+  "price": "decimal >= 0",
+  "imageUrl": "string|null (url)",
+  "stockQuantity": "int|null >= 0",
+  "isActive": true
+}
+
+Response:
+- Success: 200 (ProductDto)
+- Errors: 400, 401, 403, 500
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: CreateProductRequest, ProductDto
+- Use route tenantId as source of truth.
+
+------------------------------------------------------------
+ENDPOINT: PUT /api/tenants/{tenantId}/products/{id}
+------------------------------------------------------------
+Purpose:
+- Update product.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: TenantAdmin
+- Policies: TenantAccess
+- Claims: tenant_id match for non-SystemAdmin
+- Tenant Rules: same as create.
+
+Request:
+- Path Params: tenantId (guid), id (guid)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: UpdateProductDto
+- Payload:
+{
+  "id": "guid (overwritten from route)",
+  "tenantId": "guid (overwritten from route)",
+  "attachmentId": "guid|null",
+  "name": "string",
+  "description": "string|null",
+  "price": "decimal >= 0",
+  "imageUrl": "string|null",
+  "stockQuantity": "int|null >= 0",
+  "isActive": true
+}
+
+Response:
+- Success: 204
+- Errors: 400, 401, 403, 404, 500
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: UpdateProductRequest
+
+------------------------------------------------------------
+ENDPOINT: DELETE /api/tenants/{tenantId}/products/{id}
+------------------------------------------------------------
+Purpose:
+- Soft delete product.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: TenantAdmin
+- Policies: TenantAccess
+- Claims: tenant_id match for non-SystemAdmin
+- Tenant Rules: same as create.
+
+Request:
+- Path Params: tenantId (guid), id (guid)
+- Headers: Authorization
+
+Response:
+- Success: 204
+- Errors: 401, 403, 404, 500
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: DeleteProductParams
+
+
+============================================================
+MODULE: Orders
+============================================================
+
+------------------------------------------------------------
+ENDPOINT: POST /api/tenants/{tenantId}/orders
+------------------------------------------------------------
+Purpose:
+- Create order.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: Any authenticated role (no action role restriction)
+- Policies: TenantAccess
+- Claims:
+  - NameIdentifier must be parseable Guid
+  - tenant_id must match route for non-SystemAdmin
+- Tenant Rules:
+  - TenantAccess policy enforced
+  - SystemAdmin bypass exists in policy
+
+Request:
+- Path Params: tenantId (guid)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: CreateOrderRequest
+- Payload:
+{
+  "customerId": "guid (required)",
+  "deliveryAddress": "string (required)",
+  "totalAmount": "decimal >= 0 (client value ignored/recomputed)",
+  "items": [
+    {
+      "productId": "guid (required)",
+      "quantity": "int >= 1",
+      "unitPrice": "decimal >= 0 (client value ignored, server uses product price)"
+    }
+  ]
+}
+- Additional service validation:
+  - at least one item
+  - no duplicate productId in items
+  - product must exist in tenant
+
+Response:
+- Success: 201 Created (OrderDto)
+- Errors:
+  - 400 (ArgumentException mapped)
+  - 403 (UnauthorizedAccessException mapped)
+  - 401
+  - 500 (some exceptions like InvalidOperationException not mapped)
+- Success body (OrderDto):
+{
+  "id": "guid",
+  "tenantId": "guid",
+  "customerId": "guid",
+  "deliveryAddress": "string",
+  "status": "string",
+  "totalAmount": 0,
+  "createdAtUtc": "datetime",
+  "updatedAtUtc": "datetime|null",
+  "statusHistory": [
+    {
+      "id": "guid",
+      "fromStatus": "string",
+      "toStatus": "string",
+      "actionName": "string",
+      "comment": "string|null",
+      "changedBy": "guid",
+      "changedAtUtc": "datetime"
+    }
+  ]
+}
+- Error body:
+{
+  "message": "string"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: CreateOrderRequest, CreateOrderItemRequest, OrderDto
+- Treat totalAmount/unitPrice as server-controlled values.
+
+------------------------------------------------------------
+ENDPOINT: GET /api/tenants/{tenantId}/orders/{orderId}
+------------------------------------------------------------
+Purpose:
+- Get order by id.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: Any authenticated role
+- Policies: TenantAccess
+- Claims:
+  - NameIdentifier guid
+  - tenant_id match for non-SystemAdmin
+- Tenant Rules:
+  - If caller is not TenantAdmin, only own orders (CustomerId == current user id)
+  - SystemAdmin behavior here is not clearly bypassed in this service path
+
+Request:
+- Path Params: tenantId (guid), orderId (guid)
+- Headers: Authorization
+
+Response:
+- Success: 200 (OrderDto)
+- Errors: 401, 403, 404
+- Error body:
+{
+  "message": "string"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: OrderDto, OrderStatusHistoryDto
+
+------------------------------------------------------------
+ENDPOINT: POST /api/tenants/{tenantId}/orders/{orderId}/approve
+------------------------------------------------------------
+Purpose:
+- Approve order (status transition to Approved).
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: TenantAdmin
+- Policies: TenantAccess
+- Claims: tenant_id match for non-SystemAdmin + NameIdentifier
+- Tenant Rules: TenantAdmin endpoint.
+
+Request:
+- Path Params: tenantId (guid), orderId (guid)
+- Headers: Authorization
+- Body DTO: None
+
+Response:
+- Success: 204
+- Errors: 400, 401, 403, 404
+- Error body:
+{
+  "message": "string"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: ApproveOrderParams
+- Transition rules are enforced.
+
+------------------------------------------------------------
+ENDPOINT: POST /api/tenants/{tenantId}/orders/{orderId}/reject
+------------------------------------------------------------
+Purpose:
+- Reject order with reason.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: TenantAdmin
+- Policies: TenantAccess
+- Claims: tenant_id + NameIdentifier
+- Tenant Rules: TenantAdmin endpoint.
+
+Request:
+- Path Params: tenantId (guid), orderId (guid)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: RejectOrderRequest
+- Payload:
+{
+  "reason": "string (required, min length 3)"
+}
+
+Response:
+- Success: 204
+- Errors: 400, 401, 403, 404
+- Error body:
+{
+  "message": "string"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: RejectOrderRequest
+
+------------------------------------------------------------
+ENDPOINT: POST /api/tenants/{tenantId}/orders/{orderId}/cancel
+------------------------------------------------------------
+Purpose:
+- Cancel order with reason.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: User
+- Policies: TenantAccess
+- Claims: tenant_id + NameIdentifier
+- Tenant Rules:
+  - Role restricted to User at action level
+  - Service additionally scopes non-tenant-admin to own customer orders
+
+Request:
+- Path Params: tenantId (guid), orderId (guid)
+- Headers: Authorization, Content-Type: application/json
+- Body DTO: CancelOrderRequest
+- Payload:
+{
+  "reason": "string (required, min length 3)"
+}
+
+Response:
+- Success: 204
+- Errors: 400, 401, 403, 404
+- Error body:
+{
+  "message": "string"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: CancelOrderRequest
+
+
+============================================================
+MODULE: Attachments
+============================================================
+
+------------------------------------------------------------
+ENDPOINT: POST /api/tenants/{tenantId}/Attachments/upload
+------------------------------------------------------------
+Purpose:
+- Upload file and persist attachment metadata.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: TenantAccess
+- Claims: non-SystemAdmin tenant_id == route tenantId
+- Tenant Rules: SystemAdmin bypass exists.
+
+Request:
+- Path Params: tenantId (guid)
+- Headers:
+  - Authorization
+  - Content-Type: multipart/form-data
+- Body DTO: AttachmentUploadRequestDto ([FromForm])
+- Payload fields:
+{
+  "category": "string (required, max 100)",
+  "entityType": "string (required, max 100)",
+  "entityId": "string (required, max 100)",
+  "file": "IFormFile (required)"
+}
+- Additional validation from service:
+  - file required and non-empty
+  - max size (default 5 MB from config)
+  - dangerous extensions blocked: .exe, .dll, .bat, .cmd, .sh, .ps1, .php, .js, .html
+  - allowed extension/content-type lists enforced from settings
+  - magic number/file signature check for jpg/jpeg/png/gif/webp/pdf
+  - metadata segments normalized (lowercase, non [a-z0-9_-] replaced with '-')
+
+Response:
+- Success: 200 (AttachmentUploadResultDto)
+- Errors: 400, 401, 403, 500
+- Success body:
+{
+  "attachmentId": "guid",
+  "tenantId": "guid",
+  "originalFileName": "string",
+  "storedFileName": "string",
+  "fileKey": "string",
+  "contentType": "string",
+  "size": 0,
+  "storageProvider": "string",
+  "url": "string|null"
+}
+- Error body:
+{
+  "message": "string"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: AttachmentUploadRequest, AttachmentUploadResult
+- Controller is not [ApiController], explicit service validation is key.
+
+------------------------------------------------------------
+ENDPOINT: GET /api/tenants/{tenantId}/Attachments/{id}
+------------------------------------------------------------
+Purpose:
+- Get attachment metadata by id in tenant scope.
+
+Authentication:
+- Required: Yes
+- Scheme: Bearer
+- Roles: SystemAdmin, TenantAdmin
+- Policies: TenantAccess
+- Claims: tenant_id route match for non-SystemAdmin
+- Tenant Rules: tenant scoped.
+
+Request:
+- Path Params: tenantId (guid), id (guid)
+- Headers: Authorization
+
+Response:
+- Success: 200 (AttachmentDto)
+- Errors: 401, 403, 404
+- Success body:
+{
+  "id": "guid",
+  "tenantId": "guid",
+  "originalFileName": "string",
+  "storedFileName": "string",
+  "fileKey": "string",
+  "storageProvider": "string",
+  "contentType": "string",
+  "size": 0,
+  "category": "string",
+  "entityType": "string",
+  "entityId": "string",
+  "uploadedAtUtc": "datetime"
+}
+- Envelope: No
+
+Frontend Notes:
+- Suggested TS interfaces: AttachmentDto
+
+
+============================================================
+GLOBAL NOTES
+============================================================
+
+- Auth roles seeded in code: SystemAdmin, TenantAdmin, User
+- JWT claims include:
+  - ClaimTypes.NameIdentifier (user id string)
+  - ClaimTypes.Email
+  - ClaimTypes.Role (for each role)
+  - tenant_id (if user has TenantId)
+- TenantAccess policy:
+  - SystemAdmin bypass
+  - otherwise requires route tenantId == claim tenant_id
+- Standard response envelope:
+  - Not used; endpoints return raw DTOs or simple { "message": "..." } objects.
+- Pagination type used:
+  - PagedResult<T> with Items, PageNumber, PageSize, TotalCount, TotalPages, HasNext, HasPrevious
+- Important implementation caveats:
+  - Some service exceptions are not mapped in controllers and can surface as 500.
+  - In Orders, SystemAdmin bypass is policy-level, but some service methods still depend on IsTenantAdmin for broad visibility.
+  - Tenants/GetTenants includes isActive query parameter, but filtering by it is not clearly enforced in current service code.
+

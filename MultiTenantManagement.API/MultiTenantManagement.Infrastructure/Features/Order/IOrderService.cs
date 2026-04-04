@@ -10,8 +10,8 @@ public interface IOrderService
         Guid tenantId,
         Guid userId,
         CancellationToken cancellationToken = default);
-    Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId);
-    Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, string reason);
-    Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, string reason);
-    Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId);
+    Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin);
+    Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason);
+    Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason);
+    Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId, Guid currentUserId, bool isAdmin, CancellationToken ct = default);
 }

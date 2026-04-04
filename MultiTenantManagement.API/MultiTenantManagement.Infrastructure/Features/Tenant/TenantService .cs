@@ -147,6 +147,31 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
             return true;
         }
 
+        public async Task<TenantDto?> GetUserTenantAsync(CancellationToken ct)
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            if (user?.Identity?.IsAuthenticated != true)
+                return null;
+
+            var tenantIdClaim = user.Claims
+                .FirstOrDefault(c => c.Type == "tenant_id")
+                ?.Value;
+
+            if (string.IsNullOrWhiteSpace(tenantIdClaim))
+                return null;
+
+            if (!Guid.TryParse(tenantIdClaim, out var tenantId))
+                return null;
+
+            return await _db.Tenants
+                .AsNoTracking()
+                .Where(t => t.Id == tenantId && !t.IsDeleted)
+                .Include(t => t.StoreSetting)
+                .ProjectTo<TenantDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(ct);
+        }
+
         public bool HasTenantAccessForCurrentUser(Guid routeTenantId)
         {
             var user = _httpContextAccessor.HttpContext?.User;
@@ -170,13 +195,14 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
             if (string.IsNullOrWhiteSpace(claimTenantIdStr))
                 return false;
 
-            // حاول تحويل claimTenantId إلى Guid وقارن
             if (!Guid.TryParse(claimTenantIdStr, out var claimTenantId))
                 return false;
 
             // Compare route vs JWT
             return claimTenantId == routeTenantId;
         }
+
+
 
 
     }

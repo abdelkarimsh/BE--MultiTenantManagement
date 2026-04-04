@@ -90,22 +90,29 @@ public class OrderService : IOrderService
         return order;
     }
 
-    public Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId)
-        => ChangeStatusAsync(orderId, tenantId, userId, OrderStatus.Approved, "Approve", null);
+    public Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId,bool isTenantAdmin)
+        => ChangeStatusAsync(orderId, tenantId, userId,isTenantAdmin, OrderStatus.Approved, "Approve", null);
 
-    public Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, string reason)
-        => ChangeStatusAsync(orderId, tenantId, userId, OrderStatus.Rejected, "Reject", reason);
+    public Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason)
+        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Rejected, "Reject", reason);
 
-    public Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, string reason)
-        => ChangeStatusAsync(orderId, tenantId, userId, OrderStatus.Cancelled, "Cancel", reason);
+    public Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason)
+        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Cancelled, "Cancel", reason);
 
-    public async Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId)
+    public async Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId,Guid currentUserId, bool isTenantAdmin, CancellationToken ct = default)
     {
         EnsureTenantAccess(tenantId);
 
-        var order = await _dbContext.Orders
+        var query = _dbContext.Orders
             .AsNoTracking()
-            .Where(x => x.Id == orderId && x.TenantId == tenantId)
+            .Where(x => x.Id == orderId && x.TenantId == tenantId);
+
+        if (!isTenantAdmin)
+        {
+            query = query.Where(x => x.CustomerId == currentUserId);
+        }
+
+        var order = await query
             .Select(x => new OrderDto
             {
                 Id = x.Id,
@@ -130,20 +137,24 @@ public class OrderService : IOrderService
                     })
                     .ToList()
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(ct);
 
         return order ?? throw new OrderNotFoundException(orderId, tenantId);
     }
 
-    private async Task ChangeStatusAsync(Guid orderId, Guid tenantId, Guid userId, OrderStatus nextStatus, string actionName, string? comment)
+    private async Task ChangeStatusAsync(Guid orderId, Guid tenantId, Guid userId,bool isTenantAdmin, OrderStatus nextStatus, string actionName, string? comment)
     {
         EnsureTenantAccess(tenantId);
 
         if ((nextStatus == OrderStatus.Rejected || nextStatus == OrderStatus.Cancelled) && string.IsNullOrWhiteSpace(comment))
             throw new ArgumentException("A reason is required.", nameof(comment));
+        var query = _dbContext.Orders
+          .Where(x => x.Id == orderId && x.TenantId == tenantId);
 
-        var order = await _dbContext.Orders
-            .FirstOrDefaultAsync(x => x.Id == orderId && x.TenantId == tenantId);
+        if (!isTenantAdmin)
+            query = query.Where(x => x.CustomerId == userId);
+
+        var order = await query.FirstOrDefaultAsync();
 
         if (order is null)
             throw new OrderNotFoundException(orderId, tenantId);

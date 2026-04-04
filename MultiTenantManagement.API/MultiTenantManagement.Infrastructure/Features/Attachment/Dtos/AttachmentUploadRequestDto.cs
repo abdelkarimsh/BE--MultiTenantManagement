@@ -5,8 +5,8 @@ namespace MultiTenantManagement.Infrastructure.Features.Attachment.Dtos;
 
 public class AttachmentUploadRequestDto
 {
-    [Required]
-    public Guid TenantId { get; set; }
+    //[Required]
+    //public Guid TenantId { get; set; }
 
     [Required]
     [MaxLength(100)]

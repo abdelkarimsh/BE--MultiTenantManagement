@@ -23,7 +23,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Users
 
         public async Task<List<UserDto>> GetUsersAsync(Guid? tenantIdFilter, CancellationToken ct)
         {
-            var q = _userManager.Users.AsNoTracking().Where(u => !u.IsDeleted); ;
+            var q = _userManager.Users.Include(x=>x.Tenant).AsNoTracking().Where(u => !u.IsDeleted); ;
 
             if (tenantIdFilter.HasValue)
                 q = q.Where(u => u.TenantId == tenantIdFilter.Value );
@@ -41,11 +41,11 @@ namespace MultiTenantManagement.Infrastructure.Features.Users
                     Email = u.Email!,
                     PhoneNumber = u.PhoneNumber,
                     TenantId = u.TenantId,
-                    Roles = roles.ToList()
+                    Roles = roles.ToList(),
+                    Tenant = u.Tenant?.Name
                 });
 
             }
-
             return result;
         }
 
@@ -135,5 +135,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Users
 
             return true;
         }
+
+
     }
 }

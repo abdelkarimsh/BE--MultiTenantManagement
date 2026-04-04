@@ -18,11 +18,11 @@ namespace MultiTenantManagement.API.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload([FromForm] AttachmentUploadRequestDto request, CancellationToken ct = default)
+        public async Task<IActionResult> Upload([FromRoute]Guid tenantId, [FromForm] AttachmentUploadRequestDto request, CancellationToken ct = default)
         {
             try
             {
-                var result = await _attachmentService.UploadAsync(request, ct);
+                var result = await _attachmentService.UploadAsync(tenantId,request, ct);
                 return Ok(result);
             }
             catch (ArgumentException ex)
@@ -32,9 +32,9 @@ namespace MultiTenantManagement.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id, CancellationToken ct = default)
+        public async Task<IActionResult> GetById([FromRoute] Guid tenantId, Guid id, CancellationToken ct = default)
         {
-            var attachment = await _attachmentService.GetByIdAsync(id, ct);
+            var attachment = await _attachmentService.GetByIdAsync(tenantId,id, ct);
             if (attachment is null)
                 return NotFound();
 

@@ -25,5 +25,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
         Task<bool> DeleteAsync(Guid id, CancellationToken ct);
         bool HasTenantAccessForCurrentUser(Guid routeTenantId);
 
+        Task<TenantDto?> GetUserTenantAsync(CancellationToken ct);
+
     }
 }

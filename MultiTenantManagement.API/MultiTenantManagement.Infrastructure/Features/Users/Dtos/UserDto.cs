@@ -13,5 +13,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Users.Dtos
         public string? PhoneNumber { get; set; }
         public Guid? TenantId { get; set; }
         public List<string> Roles { get; set; } = new();
+
+        public string? Tenant { get; set; }
     }
 }

@@ -22,7 +22,6 @@ using MultiTenantManagement.Infrastructure.Storage;
 using Amazon;
 using Amazon.S3;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -50,14 +49,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .SetIsOriginAllowed(_ => true) 
+            .SetIsOriginAllowed(_ => true)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
     });
 });
-
-
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -85,8 +82,6 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("SystemAdmin"));
 });
 
-
-
 // Services
 builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
@@ -97,34 +92,45 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.Configure<AttachmentOptions>(builder.Configuration.GetSection(AttachmentOptions.SectionName));
-builder.Services.Configure<S3StorageSettings>(builder.Configuration.GetSection(S3StorageSettings.SectionName));
-builder.Services.AddSingleton<IAmazonS3>(sp =>
+builder.Services.Configure<StorageSettings>(builder.Configuration.GetSection(StorageSettings.SectionName));
+
+var storageSettings = builder.Configuration.GetSection(StorageSettings.SectionName).Get<StorageSettings>()
+                      ?? new StorageSettings();
+
+if (storageSettings.UseS3)
 {
-    var settings = builder.Configuration.GetSection(S3StorageSettings.SectionName).Get<S3StorageSettings>()
-                   ?? throw new InvalidOperationException("Missing S3 storage configuration.");
-
-    if (string.IsNullOrWhiteSpace(settings.BucketName) ||
-        string.IsNullOrWhiteSpace(settings.Region) ||
-        string.IsNullOrWhiteSpace(settings.AccessKey) ||
-        string.IsNullOrWhiteSpace(settings.SecretKey))
+    builder.Services.Configure<S3StorageSettings>(builder.Configuration.GetSection(S3StorageSettings.SectionName));
+    builder.Services.AddSingleton<IAmazonS3>(_ =>
     {
-        throw new InvalidOperationException("S3 storage configuration is invalid.");
-    }
+        var settings = builder.Configuration.GetSection(S3StorageSettings.SectionName).Get<S3StorageSettings>()
+                       ?? throw new InvalidOperationException("Missing S3 storage configuration.");
 
-    return new AmazonS3Client(
-        settings.AccessKey,
-        settings.SecretKey,
-        RegionEndpoint.GetBySystemName(settings.Region));
-});
-builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+        if (string.IsNullOrWhiteSpace(settings.BucketName) ||
+            string.IsNullOrWhiteSpace(settings.Region) ||
+            string.IsNullOrWhiteSpace(settings.AccessKey) ||
+            string.IsNullOrWhiteSpace(settings.SecretKey))
+        {
+            throw new InvalidOperationException("S3 storage configuration is invalid.");
+        }
 
+        return new AmazonS3Client(
+            settings.AccessKey,
+            settings.SecretKey,
+            RegionEndpoint.GetBySystemName(settings.Region));
+    });
+
+    builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+}
 
 builder.Services.AddSingleton<IAuthorizationHandler, TenantAccessHandler>();
 
-
 // AutoMapper
 builder.Services.AddAutoMapper(
-    cfg => { },      
+    cfg => { },
     typeof(MappingProfile));
 
 builder.Services.AddSwaggerGen(c =>
@@ -161,7 +167,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 var app = builder.Build();
 
 await SeedData.SeedAsync(app.Services);
@@ -174,6 +179,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();

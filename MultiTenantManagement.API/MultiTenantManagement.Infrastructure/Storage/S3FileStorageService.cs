@@ -44,6 +44,20 @@ public class S3FileStorageService : IFileStorageService
         };
     }
 
+    public async Task DeleteAsync(string fileKey, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(fileKey))
+            throw new ArgumentException("File key is required.", nameof(fileKey));
+
+        var deleteRequest = new DeleteObjectRequest
+        {
+            BucketName = _settings.BucketName,
+            Key = fileKey
+        };
+
+        await _s3Client.DeleteObjectAsync(deleteRequest, ct);
+    }
+
     private string BuildFileKey(FileStorageUploadRequest request)
     {
         return $"tenants/{request.TenantId:D}/{request.Category}/{request.EntityType}/{request.EntityId}/{request.StoredFileName}";

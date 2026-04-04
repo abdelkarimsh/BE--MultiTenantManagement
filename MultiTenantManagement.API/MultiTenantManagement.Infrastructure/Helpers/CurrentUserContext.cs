@@ -12,8 +12,8 @@ namespace MultiTenantManagement.Infrastructure.Helpers
     public class CurrentUserContext : ICurrentUserContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+
         private const string TenantIdClaimName = "tenant_id";
-        private const string IsSuperAdminClaimName = "is_super_admin";
 
         public CurrentUserContext(IHttpContextAccessor httpContextAccessor)
         {
@@ -36,16 +36,15 @@ namespace MultiTenantManagement.Infrastructure.Helpers
             }
         }
 
-        public bool IsSuperAdmin
-        {
-            get
-            {
-                var claim = User?.FindFirst(IsSuperAdminClaimName);
-                if (claim?.Value == "true")
-                    return true;
+        public IReadOnlyList<string> Roles =>
+            User?.FindAll(ClaimTypes.Role)
+                .Select(x => x.Value)
+                .ToList()
+            ?? new List<string>();
 
-                return false;
-            }
-        }
+        public bool IsSystemAdmin => User?.IsInRole("SystemAdmin") == true;
+
+        public bool IsTenantAdmin => User?.IsInRole("TenantAdmin") == true;
+
     }
 }

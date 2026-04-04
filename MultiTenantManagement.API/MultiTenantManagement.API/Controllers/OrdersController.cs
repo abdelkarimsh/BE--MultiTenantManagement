@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MultiTenantManagement.Core.Interfaces;
 using MultiTenantManagement.Infrastructure.Features.Order;
 using MultiTenantManagement.Infrastructure.Features.Order.Dtos;
 using MultiTenantManagement.Infrastructure.Features.Order.Exceptions;
@@ -14,10 +15,11 @@ namespace MultiTenantManagement.API.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-
-        public OrdersController(IOrderService orderService)
+        private readonly ICurrentUserContext _currentUserContext;
+        public OrdersController(IOrderService orderService , ICurrentUserContext currentUserContext)
         {
             _orderService = orderService;
+            _currentUserContext = currentUserContext;
         }
 
         [HttpPost]
@@ -27,7 +29,7 @@ namespace MultiTenantManagement.API.Controllers
             {
                 var userId = GetCurrentUserId();
                 var order = await _orderService.CreateOrderAsync(request, tenantId, userId);
-                var orderDto = await _orderService.GetOrderByIdAsync(order.Id, tenantId);
+                var orderDto = await _orderService.GetOrderByIdAsync(order.Id, tenantId,userId, _currentUserContext.IsTenantAdmin);
                 return CreatedAtAction(nameof(GetOrderById), new { tenantId, orderId = order.Id }, orderDto);
             }
             catch (ArgumentException ex)
@@ -45,7 +47,8 @@ namespace MultiTenantManagement.API.Controllers
         {
             try
             {
-                var order = await _orderService.GetOrderByIdAsync(orderId, tenantId);
+                var userId = GetCurrentUserId();
+                var order = await _orderService.GetOrderByIdAsync(orderId, tenantId,userId, _currentUserContext.IsTenantAdmin);
                 return Ok(order);
             }
             catch (OrderNotFoundException ex)
@@ -65,7 +68,7 @@ namespace MultiTenantManagement.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                await _orderService.ApproveOrderAsync(orderId, tenantId, userId);
+                await _orderService.ApproveOrderAsync(orderId, tenantId, userId,_currentUserContext.IsTenantAdmin);
                 return NoContent();
             }
             catch (OrderNotFoundException ex)
@@ -88,7 +91,7 @@ namespace MultiTenantManagement.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                await _orderService.RejectOrderAsync(orderId, tenantId, userId, request.Reason);
+                await _orderService.RejectOrderAsync(orderId, tenantId, userId, _currentUserContext.IsTenantAdmin, request.Reason);
                 return NoContent();
             }
             catch (OrderNotFoundException ex)
@@ -116,7 +119,7 @@ namespace MultiTenantManagement.API.Controllers
             try
             {
                 var userId = GetCurrentUserId();
-                await _orderService.CancelOrderAsync(orderId, tenantId, userId, request.Reason);
+                await _orderService.CancelOrderAsync(orderId, tenantId, userId, _currentUserContext.IsTenantAdmin, request.Reason);
                 return NoContent();
             }
             catch (OrderNotFoundException ex)

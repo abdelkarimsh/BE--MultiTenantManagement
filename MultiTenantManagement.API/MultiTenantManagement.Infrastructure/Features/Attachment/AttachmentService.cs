@@ -34,9 +34,9 @@ namespace MultiTenantManagement.Infrastructure.Features.Attachment
             _options = options.Value;
         }
 
-        public async Task<AttachmentUploadResultDto> UploadAsync(AttachmentUploadRequestDto request, CancellationToken ct = default)
+        public async Task<AttachmentUploadResultDto> UploadAsync(Guid tenantId, AttachmentUploadRequestDto request, CancellationToken ct = default)
         {
-            ValidateRequest(request);
+            ValidateRequest(request,tenantId);
 
             var file = request.File;
             var extension = NormalizeExtension(Path.GetExtension(file.FileName));
@@ -50,7 +50,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Attachment
 
             var storageResult = await _fileStorageService.UploadAsync(new FileStorageUploadRequest
             {
-                TenantId = request.TenantId,
+                TenantId = tenantId,
                 Category = NormalizeSegment(request.Category),
                 EntityType = NormalizeSegment(request.EntityType),
                 EntityId = NormalizeSegment(request.EntityId),
@@ -93,11 +93,11 @@ namespace MultiTenantManagement.Infrastructure.Features.Attachment
             };
         }
 
-        public async Task<AttachmentDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        public async Task<AttachmentDto?> GetByIdAsync(Guid tenantId, Guid id, CancellationToken ct = default)
         {
             return await _db.Attachments
                 .AsNoTracking()
-                .Where(x => x.Id == id)
+                .Where(x => x.Id == id && x.TenantId == tenantId)
                 .Select(x => new AttachmentDto
                 {
                     Id = x.Id,
@@ -116,12 +116,12 @@ namespace MultiTenantManagement.Infrastructure.Features.Attachment
                 .FirstOrDefaultAsync(ct);
         }
 
-        private void ValidateRequest(AttachmentUploadRequestDto request)
+        private void ValidateRequest(AttachmentUploadRequestDto request,Guid tenantId)
         {
             if (request == null)
                 throw new ArgumentException("Upload request is required.");
 
-            if (request.TenantId == Guid.Empty)
+            if (tenantId == Guid.Empty)
                 throw new ArgumentException("TenantId is required.");
 
             if (string.IsNullOrWhiteSpace(request.Category))
