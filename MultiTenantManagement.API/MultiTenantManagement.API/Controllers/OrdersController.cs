@@ -6,6 +6,7 @@ using MultiTenantManagement.Core.Interfaces;
 using MultiTenantManagement.Infrastructure.Features.Order;
 using MultiTenantManagement.Infrastructure.Features.Order.Dtos;
 using MultiTenantManagement.Infrastructure.Features.Order.Exceptions;
+using MultiTenantManagement.Infrastructure.Helpers;
 
 namespace MultiTenantManagement.API.Controllers
 {
@@ -42,6 +43,40 @@ namespace MultiTenantManagement.API.Controllers
             }
         }
 
+
+        [Authorize(Roles = "TenantAdmin,SystemAdmin")]
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<OrderListItemDto>>> GetOrders(
+            Guid tenantId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? sortBy = "createdAtUtc",
+            [FromQuery] bool isAscending = false,
+            [FromQuery] string? search = null,
+            [FromQuery] string? status = null,
+            [FromQuery] Guid? customerId = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                var result = await _orderService.GetOrdersAsync(
+                    tenantId,
+                    pageNumber,
+                    pageSize,
+                    sortBy,
+                    isAscending,
+                    search,
+                    status,
+                    customerId,
+                    ct);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+        }
         [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetOrderById(Guid tenantId, Guid orderId)
         {
@@ -150,3 +185,4 @@ namespace MultiTenantManagement.API.Controllers
         }
     }
 }
+

@@ -1,3 +1,4 @@
+using MultiTenantManagement.Infrastructure.Helpers;
 using MultiTenantManagement.Infrastructure.Features.Order.Dtos;
 using OrderEntity = MultiTenantManagement.Data.Models.Order;
 
@@ -14,4 +15,6 @@ public interface IOrderService
     Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason);
     Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason);
     Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId, Guid currentUserId, bool isAdmin, CancellationToken ct = default);
+    Task<PagedResult<OrderListItemDto>> GetOrdersAsync(Guid tenantId, int pageNumber, int pageSize, string? sortBy, bool isAscending, string? search, string? status, Guid? customerId, CancellationToken ct = default);
 }
+

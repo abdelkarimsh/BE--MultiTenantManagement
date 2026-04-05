@@ -6,6 +6,7 @@ using MultiTenantManagement.Data.Models;
 using MultiTenantManagement.Infrastructure.Features.Order.Dtos;
 using MultiTenantManagement.Infrastructure.Features.Order.Exceptions;
 using MultiTenantManagement.Infrastructure.Features.Order.Helpers;
+using MultiTenantManagement.Infrastructure.Helpers;
 using MultiTenantManagement.Infrastructure.Features.Tenant;
 using OrderEntity = MultiTenantManagement.Data.Models.Order;
 
@@ -142,6 +143,98 @@ public class OrderService : IOrderService
         return order ?? throw new OrderNotFoundException(orderId, tenantId);
     }
 
+
+    public async Task<PagedResult<OrderListItemDto>> GetOrdersAsync(
+        Guid tenantId,
+        int pageNumber,
+        int pageSize,
+        string? sortBy,
+        bool isAscending,
+        string? search,
+        string? status,
+        Guid? customerId,
+        CancellationToken ct = default)
+    {
+        EnsureTenantAccess(tenantId);
+
+        if (pageNumber <= 0) pageNumber = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        var query = _dbContext.Orders
+            .AsNoTracking()
+            .Where(x => x.TenantId == tenantId);
+
+        if (customerId.HasValue)
+        {
+            query = query.Where(x => x.CustomerId == customerId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var normalizedStatus = status.Trim().ToLower();
+            query = query.Where(x => x.Status.ToLower() == normalizedStatus);
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim();
+            if (Guid.TryParse(search, out var searchOrderId))
+            {
+                query = query.Where(x => x.Id == searchOrderId || x.DeliveryAddress.Contains(search));
+            }
+            else
+            {
+                query = query.Where(x => x.DeliveryAddress.Contains(search));
+            }
+        }
+
+        query = sortBy?.ToLower() switch
+        {
+            "totalamount" => isAscending
+                ? query.OrderBy(x => x.TotalAmount).ThenBy(x => x.Id)
+                : query.OrderByDescending(x => x.TotalAmount).ThenByDescending(x => x.Id),
+            "status" => isAscending
+                ? query.OrderBy(x => x.Status).ThenBy(x => x.Id)
+                : query.OrderByDescending(x => x.Status).ThenByDescending(x => x.Id),
+            "createdatutc" or "createdat" => isAscending
+                ? query.OrderBy(x => x.CreatedAtUtc).ThenBy(x => x.Id)
+                : query.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id),
+            _ => isAscending
+                ? query.OrderBy(x => x.CreatedAtUtc).ThenBy(x => x.Id)
+                : query.OrderByDescending(x => x.CreatedAtUtc).ThenByDescending(x => x.Id)
+        };
+
+        var totalCount = await query.CountAsync(ct);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new OrderListItemDto
+            {
+                Id = x.Id,
+                TenantId = x.TenantId,
+                CustomerId = x.CustomerId,
+                DeliveryAddress = x.DeliveryAddress,
+                Status = x.Status,
+                TotalAmount = x.TotalAmount,
+                CreatedAtUtc = x.CreatedAtUtc,
+                UpdatedAtUtc = x.UpdatedAtUtc
+            })
+            .ToListAsync(ct);
+
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        return new PagedResult<OrderListItemDto>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+            HasNext = pageNumber < totalPages,
+            HasPrevious = pageNumber > 1
+        };
+    }
     private async Task ChangeStatusAsync(Guid orderId, Guid tenantId, Guid userId,bool isTenantAdmin, OrderStatus nextStatus, string actionName, string? comment)
     {
         EnsureTenantAccess(tenantId);
@@ -188,3 +281,4 @@ public class OrderService : IOrderService
             throw new UnauthorizedAccessException("User does not have access to this tenant.");
     }
 }
+

@@ -51,6 +51,17 @@ public class OrderDto
     public List<OrderStatusHistoryDto> StatusHistory { get; set; } = new();
 }
 
+public class OrderListItemDto
+{
+    public Guid Id { get; set; }
+    public Guid TenantId { get; set; }
+    public Guid CustomerId { get; set; }
+    public string DeliveryAddress { get; set; } = string.Empty;
+    public string Status { get; set; }
+    public decimal TotalAmount { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public DateTime? UpdatedAtUtc { get; set; }
+}
 public class OrderStatusHistoryDto
 {
     public Guid Id { get; set; }
@@ -61,3 +72,4 @@ public class OrderStatusHistoryDto
     public Guid ChangedBy { get; set; }
     public DateTime ChangedAtUtc { get; set; }
 }
+

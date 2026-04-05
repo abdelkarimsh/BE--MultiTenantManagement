@@ -23,7 +23,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Product.Dtos
         [Range(0.0, double.MaxValue)]
         public decimal Price { get; set; }
 
-        [Url]
+        [MaxLength(500)]
         public string? ImageUrl { get; set; }
 
         [Range(0, int.MaxValue)]
