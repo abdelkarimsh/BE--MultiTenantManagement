@@ -124,6 +124,15 @@ public class OrderService : IOrderService
                 TotalAmount = x.TotalAmount,
                 CreatedAtUtc = x.CreatedAtUtc,
                 UpdatedAtUtc = x.UpdatedAtUtc,
+                ListItems = x.Items.Select(i=> new OrderItemDto
+                {
+                    Id =i.Id,
+                    OrderId =i.OrderId,
+                    ProductName = i.Product != null ? i.Product.Name : string.Empty,
+                    ProductId =i.ProductId,
+                    Quantity =i.Quantity,
+                    UnitPrice =i.UnitPrice
+                }).ToList(),
                 StatusHistory = x.StatusHistory
                     .OrderBy(h => h.ChangedAtUtc)
                     .Select(h => new OrderStatusHistoryDto

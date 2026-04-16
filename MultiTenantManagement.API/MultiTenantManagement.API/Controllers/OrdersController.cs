@@ -77,6 +77,43 @@ namespace MultiTenantManagement.API.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
             }
         }
+
+
+
+        [Authorize]
+        [HttpGet("CustomerOrders")]
+        public async Task<ActionResult<PagedResult<OrderListItemDto>>> GetCustomerOrders(
+            Guid tenantId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? sortBy = "createdAtUtc",
+            [FromQuery] bool isAscending = false,
+            [FromQuery] string? search = null,
+            [FromQuery] string? status = null,
+            CancellationToken ct = default)
+        {
+            try
+            {
+                var customerId = GetCurrentUserId();
+                var result = await _orderService.GetOrdersAsync(
+                    tenantId,
+                    pageNumber,
+                    pageSize,
+                    sortBy,
+                    isAscending,
+                    search,
+                    status,
+                    customerId,
+                    ct);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = ex.Message });
+            }
+        }
+
         [HttpGet("{orderId:guid}")]
         public async Task<IActionResult> GetOrderById(Guid tenantId, Guid orderId)
         {
