@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -135,12 +136,12 @@ namespace MultiTenantManagement.API.Controllers
 
         [Authorize(Roles = "TenantAdmin")]
         [HttpPost("{orderId:guid}/approve")]
-        public async Task<IActionResult> ApproveOrder(Guid tenantId, Guid orderId)
+        public async Task<IActionResult> ApproveOrder(Guid tenantId, Guid orderId,int version)
         {
             try
             {
                 var userId = GetCurrentUserId();
-                await _orderService.ApproveOrderAsync(orderId, tenantId, userId,_currentUserContext.IsTenantAdmin);
+                await _orderService.ApproveOrderAsync(orderId, tenantId, userId,_currentUserContext.IsTenantAdmin,version);
                 return NoContent();
             }
             catch (OrderNotFoundException ex)
@@ -158,12 +159,12 @@ namespace MultiTenantManagement.API.Controllers
         }
         [Authorize(Roles = "TenantAdmin")]
         [HttpPost("{orderId:guid}/reject")]
-        public async Task<IActionResult> RejectOrder(Guid tenantId, Guid orderId, [FromBody] RejectOrderRequest request)
+        public async Task<IActionResult> RejectOrder(Guid tenantId, Guid orderId, [FromBody] RejectOrderRequest request,int version)
         {
             try
             {
                 var userId = GetCurrentUserId();
-                await _orderService.RejectOrderAsync(orderId, tenantId, userId, _currentUserContext.IsTenantAdmin, request.Reason);
+                await _orderService.RejectOrderAsync(orderId, tenantId, userId, _currentUserContext.IsTenantAdmin, request.Reason,version);
                 return NoContent();
             }
             catch (OrderNotFoundException ex)
@@ -186,12 +187,12 @@ namespace MultiTenantManagement.API.Controllers
 
         [Authorize(Roles = "User")]
         [HttpPost("{orderId:guid}/cancel")]
-        public async Task<IActionResult> CancelOrder(Guid tenantId, Guid orderId, [FromBody] CancelOrderRequest request)
+        public async Task<IActionResult> CancelOrder(Guid tenantId, Guid orderId, [FromBody] CancelOrderRequest request, int version)
         {
             try
             {
                 var userId = GetCurrentUserId();
-                await _orderService.CancelOrderAsync(orderId, tenantId, userId, _currentUserContext.IsTenantAdmin, request.Reason);
+                await _orderService.CancelOrderAsync(orderId, tenantId, userId, _currentUserContext.IsTenantAdmin, request.Reason,version);
                 return NoContent();
             }
             catch (OrderNotFoundException ex)

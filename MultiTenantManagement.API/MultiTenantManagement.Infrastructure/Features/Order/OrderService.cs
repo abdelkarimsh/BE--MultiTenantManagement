@@ -29,13 +29,10 @@ public class OrderService : IOrderService
      Guid userId,
      CancellationToken cancellationToken = default)
     {
-        EnsureTenantAccess(tenantId);
+        await EnsureTenantAccessAsync(tenantId,cancellationToken);
 
         if (request is null)
             throw new ArgumentNullException(nameof(request));
-
-        if (request.CustomerId == Guid.Empty)
-            throw new ArgumentException("CustomerId is required.", nameof(request.CustomerId));
 
         if (string.IsNullOrWhiteSpace(request.DeliveryAddress))
             throw new ArgumentException("DeliveryAddress is required.", nameof(request.DeliveryAddress));
@@ -52,12 +49,21 @@ public class OrderService : IOrderService
         if (duplicateProducts.Any())
             throw new ArgumentException("Duplicate products are not allowed in the order.");
 
+        var productIds = request.Items.Select(i => i.ProductId).ToList();
+
+        var products = await _dbContext.Products
+            .Where(p => productIds.Contains(p.Id) && p.TenantId == tenantId)
+            .ToListAsync(cancellationToken);
+
+        var productDict = products.ToDictionary(p => p.Id);
+
         var order = new OrderEntity
         {
             TenantId = tenantId,
-            CustomerId = request.CustomerId,
+            CustomerId = userId,
             DeliveryAddress = request.DeliveryAddress.Trim(),
-            Status = OrderStatus.PendingApproval.ToString()
+            Status = OrderStatus.PendingApproval.ToString(),
+            CreatedAtUtc = DateTime.UtcNow
         };
 
         foreach (var item in request.Items)
@@ -68,41 +74,59 @@ public class OrderService : IOrderService
             if (item.Quantity <= 0)
                 throw new ArgumentException("Each item must have Quantity greater than zero.");
 
-            var product = await _dbContext.Products
-                .FirstOrDefaultAsync(p => p.Id == item.ProductId && p.TenantId == tenantId, cancellationToken);
-
-            if (product == null)
+            if (!productDict.TryGetValue(item.ProductId, out var product))
                 throw new InvalidOperationException($"Product {item.ProductId} not found.");
+
+            if (product.IsDeleted || !product.IsActive)
+                throw new InvalidOperationException($"Product {product.Id} is not available.");
+
+            if (product.Version != item.ProductVersion)
+                throw new InvalidOperationException(
+                    $"Product {product.Name} was updated. Please refresh and try again.");
+
+            if (product.StockQuantity < item.Quantity)
+                throw new InvalidOperationException($"Not enough stock for product {product.Name}.");
+
+            product.StockQuantity -= item.Quantity;
+            product.Version++;
 
             order.Items.Add(new OrderItems
             {
                 TenantId = tenantId,
-                ProductId = item.ProductId,
+                ProductId = product.Id,
                 Quantity = item.Quantity,
                 UnitPrice = product.Price
             });
+
         }
 
         order.TotalAmount = order.Items.Sum(i => i.Quantity * i.UnitPrice);
 
         _dbContext.Orders.Add(order);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new InvalidOperationException(
+                "Product stock was changed by another request. Please refresh and try again.");
+        }
 
         return order;
     }
 
-    public Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId,bool isTenantAdmin)
-        => ChangeStatusAsync(orderId, tenantId, userId,isTenantAdmin, OrderStatus.Approved, "Approve", null);
+    public Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, int version)
+        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Approved, "Approve", null, version);
 
-    public Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason)
-        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Rejected, "Reject", reason);
+    public Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason, int version)
+        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Rejected, "Reject", reason, version);
 
-    public Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason)
-        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Cancelled, "Cancel", reason);
-
+    public Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason, int version)
+        => ChangeStatusAsync(orderId, tenantId, userId, isTenantAdmin, OrderStatus.Cancelled, "Cancel", reason, version);
     public async Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId,Guid currentUserId, bool isTenantAdmin, CancellationToken ct = default)
     {
-        EnsureTenantAccess(tenantId);
+        await EnsureTenantAccessAsync(tenantId,ct);
 
         var query = _dbContext.Orders
             .AsNoTracking()
@@ -124,6 +148,7 @@ public class OrderService : IOrderService
                 TotalAmount = x.TotalAmount,
                 CreatedAtUtc = x.CreatedAtUtc,
                 UpdatedAtUtc = x.UpdatedAtUtc,
+                Version = x.Version,
                 ListItems = x.Items.Select(i=> new OrderItemDto
                 {
                     Id =i.Id,
@@ -164,7 +189,7 @@ public class OrderService : IOrderService
         Guid? customerId,
         CancellationToken ct = default)
     {
-        EnsureTenantAccess(tenantId);
+        await EnsureTenantAccessAsync(tenantId,ct);
 
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
@@ -244,29 +269,49 @@ public class OrderService : IOrderService
             HasPrevious = pageNumber > 1
         };
     }
-    private async Task ChangeStatusAsync(Guid orderId, Guid tenantId, Guid userId,bool isTenantAdmin, OrderStatus nextStatus, string actionName, string? comment)
+    private async Task ChangeStatusAsync(
+     Guid orderId,
+     Guid tenantId,
+     Guid userId,
+     bool isTenantAdmin,
+     OrderStatus nextStatus,
+     string actionName,
+     string? comment,
+     int requestVersion,
+     CancellationToken ct = default)
     {
-        EnsureTenantAccess(tenantId);
+        await EnsureTenantAccessAsync(tenantId, ct);
 
-        if ((nextStatus == OrderStatus.Rejected || nextStatus == OrderStatus.Cancelled) && string.IsNullOrWhiteSpace(comment))
+        if ((nextStatus == OrderStatus.Rejected || nextStatus == OrderStatus.Cancelled) &&
+            string.IsNullOrWhiteSpace(comment))
+        {
             throw new ArgumentException("A reason is required.", nameof(comment));
+        }
+
         var query = _dbContext.Orders
-          .Where(x => x.Id == orderId && x.TenantId == tenantId);
+            .Where(x => x.Id == orderId && x.TenantId == tenantId);
 
         if (!isTenantAdmin)
             query = query.Where(x => x.CustomerId == userId);
 
-        var order = await query.FirstOrDefaultAsync();
+        var order = await query.FirstOrDefaultAsync(ct);
 
         if (order is null)
             throw new OrderNotFoundException(orderId, tenantId);
 
+        if (order.Version != requestVersion)
+            throw new InvalidOperationException("Order was modified. Please refresh and try again.");
+
         var currentStatus = order.Status;
+
         if (!OrderWorkflowRules.CanTransition(currentStatus.ToEnum<OrderStatus>(), nextStatus))
             throw new InvalidOrderTransitionException(orderId, currentStatus.ToEnum<OrderStatus>(), nextStatus);
 
+        var now = DateTime.UtcNow;
+
         order.Status = nextStatus.ToString();
-        order.UpdatedAtUtc = DateTime.UtcNow;
+        order.UpdatedAtUtc = now;
+        order.Version++;
 
         _dbContext.OrderStatusHistories.Add(new OrderStatusHistory
         {
@@ -277,15 +322,30 @@ public class OrderService : IOrderService
             ActionName = actionName,
             Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
             ChangedBy = userId,
-            ChangedAtUtc = DateTime.UtcNow
+            ChangedAtUtc = now
         });
 
-        await _dbContext.SaveChangesAsync();
+        try
+        {
+            await _dbContext.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new InvalidOperationException(
+                "Order was modified by another request.",
+                ex);
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new InvalidOperationException(
+                "Database error occurred while saving.",
+                ex);
+        }
     }
 
-    private void EnsureTenantAccess(Guid tenantId)
+    private async Task EnsureTenantAccessAsync(Guid tenantId ,CancellationToken ct)
     {
-        var hasAccess = _tenantService.HasTenantAccessForCurrentUser(tenantId);
+        var hasAccess =await _tenantService.HasTenantAccessForCurrentUserAsync(tenantId,ct);
         if (!hasAccess)
             throw new UnauthorizedAccessException("User does not have access to this tenant.");
     }

@@ -7,6 +7,10 @@ using AutoMapper;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using MultiTenantManagement.Infrastructure.Helpers;
+using Microsoft.AspNetCore.Identity;
+using MultiTenantManagement.Data.Models;
+using MultiTenantManagement.Core.Extensions;
+using MultiTenantManagement.Core.Enums;
 
 namespace MultiTenantManagement.Infrastructure.Features.Tenant
 {
@@ -15,13 +19,17 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public TenantService(AppDbContext db, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+
+        public TenantService(AppDbContext db, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
 
         }
 
@@ -172,36 +180,43 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
                 .FirstOrDefaultAsync(ct);
         }
 
-        public bool HasTenantAccessForCurrentUser(Guid routeTenantId)
+        public async Task<bool> HasTenantAccessForCurrentUserAsync(
+             Guid routeTenantId,
+             CancellationToken ct = default)
         {
-            var user = _httpContextAccessor.HttpContext?.User;
-            if (user?.Identity?.IsAuthenticated != true)
+            var principal = _httpContextAccessor.HttpContext?.User;
+
+            if (principal?.Identity?.IsAuthenticated != true)
                 return false;
 
-            // SystemAdmin bypass
-            bool isSystemAdmin =
-                user.IsInRole("SystemAdmin") ||
-                user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "SystemAdmin") ||
-                user.Claims.Any(c => c.Type == "role" && c.Value == "SystemAdmin");
+            var userIdStr = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userIdStr))
+                return false;
+
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.Id == userIdStr, ct);
+
+            if (user == null || user.IsDeleted)
+                return false;
+
+            var tenant = await _db.Tenants
+                .FirstOrDefaultAsync(t => t.Id == routeTenantId, ct);
+
+            if (tenant == null || tenant.IsDeleted)
+                return false;
+
+            if (!Enum.TryParse<TenantStatus>(tenant.Status, true, out var status) ||
+                    status != TenantStatus.Active)
+                                return false;
+
+            var isSystemAdmin = await _userManager.IsInRoleAsync(user, "SystemAdmin");
 
             if (isSystemAdmin)
                 return true;
 
-            // TenantAdmin or normal user needs to match tenantId
-            var claimTenantIdStr = user.Claims
-                .FirstOrDefault(c => c.Type == "tenant_id")
-                ?.Value;
-
-            if (string.IsNullOrWhiteSpace(claimTenantIdStr))
-                return false;
-
-            if (!Guid.TryParse(claimTenantIdStr, out var claimTenantId))
-                return false;
-
-            // Compare route vs JWT
-            return claimTenantId == routeTenantId;
+            return user.TenantId == routeTenantId;
         }
-
 
 
 

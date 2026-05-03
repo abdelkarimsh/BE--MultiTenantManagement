@@ -1,13 +1,13 @@
 using MultiTenantManagement.Core.Enums;
 using MultiTenantManagement.Infrastructure.Features.Product.Dtos;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Principal;
 
 namespace MultiTenantManagement.Infrastructure.Features.Order.Dtos;
 
 public class CreateOrderRequest
 {
-    [Required]
-    public Guid CustomerId { get; set; }
+
     [Required]
     public string DeliveryAddress { get; set; } = string.Empty;
     [Range(0, double.MaxValue)]
@@ -23,6 +23,8 @@ public class CreateOrderItemRequest
     public int Quantity { get; set; }
     [Range(0, double.MaxValue)]
     public decimal UnitPrice { get; set; }
+
+    public int ProductVersion { get; set; }
 }
 
 public class RejectOrderRequest
@@ -53,13 +55,16 @@ public class OrderDto
     public List<OrderStatusHistoryDto> StatusHistory { get; set; } = new();
 
     public List<OrderItemDto> ListItems { get; set; }
+
+    public int Version { get; set; }
+
 }
 
 
 
 public class OrderItemDto
 {
-
+    public string? CustomerName { get; set; }
     public Guid Id { get; init; }
     public Guid TenantId { get; init; }
     public Guid OrderId { get; init; }
@@ -67,6 +72,7 @@ public class OrderItemDto
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
     public string? ProductName { get; init; }
+    public int Version { get; set; }
 
 }
 public class OrderListItemDto
@@ -74,13 +80,14 @@ public class OrderListItemDto
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
     public Guid CustomerId { get; set; }
-
-    public string? CustomerName { get; set; }
     public string DeliveryAddress { get; set; } = string.Empty;
     public string Status { get; set; }
     public decimal TotalAmount { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? UpdatedAtUtc { get; set; }
+
+    public int Version { get; set; }
+
 }
 public class OrderStatusHistoryDto
 {

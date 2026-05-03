@@ -17,4 +17,6 @@ public class Order
     public ICollection<OrderItems> Items { get; init; } = new List<OrderItems>();
     public ICollection<OrderStatusHistory> StatusHistory { get; init; } = new List<OrderStatusHistory>();
     public Payment? Payment { get; set; }
+
+    public int Version { get; set; } = 1;
 }

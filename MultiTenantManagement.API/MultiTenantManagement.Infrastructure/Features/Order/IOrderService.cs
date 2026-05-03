@@ -11,9 +11,9 @@ public interface IOrderService
         Guid tenantId,
         Guid userId,
         CancellationToken cancellationToken = default);
-    Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin);
-    Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason);
-    Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason);
+    Task ApproveOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, int version);
+    Task RejectOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason, int version);
+    Task CancelOrderAsync(Guid orderId, Guid tenantId, Guid userId, bool isTenantAdmin, string reason, int version);
     Task<OrderDto> GetOrderByIdAsync(Guid orderId, Guid tenantId, Guid currentUserId, bool isAdmin, CancellationToken ct = default);
     Task<PagedResult<OrderListItemDto>> GetOrdersAsync(Guid tenantId, int pageNumber, int pageSize, string? sortBy, bool isAscending, string? search, string? status, Guid? customerId, CancellationToken ct = default);
 }

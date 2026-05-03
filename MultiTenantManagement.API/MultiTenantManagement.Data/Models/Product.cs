@@ -14,6 +14,7 @@ public class Product
     public DateTime CreatedAtUtc { get; init; } = DateTime.UtcNow;
     public bool IsDeleted { get; set; }
 
+    public int Version { get; set; } = 1;
     public Tenant? Tenant { get; init; }
     public Attachment? Attachment { get; set; }
     public ICollection<OrderItems> OrderItems { get; init; } = new List<OrderItems>();

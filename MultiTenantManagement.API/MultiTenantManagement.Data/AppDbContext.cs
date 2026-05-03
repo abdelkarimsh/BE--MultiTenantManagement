@@ -56,6 +56,9 @@ namespace MultiTenantManagement.Data
                  .WithMany()
                  .HasForeignKey(p => p.AttachmentId)
                  .OnDelete(DeleteBehavior.SetNull);
+
+                e.Property(p => p.Version)
+                    .IsConcurrencyToken();
             });
 
             builder.Entity<Order>(e =>
@@ -79,24 +82,27 @@ namespace MultiTenantManagement.Data
                 e.HasIndex(x => x.CustomerId);
 
                 e.HasOne(x => x.Tenant)
-                    .WithMany()
+                    .WithMany(t => t.Orders)
                     .HasForeignKey(x => x.TenantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                e.HasMany(x => x.Items)
-                    .WithOne()
-                    .HasForeignKey("OrderId")
-                    .OnDelete(DeleteBehavior.Cascade);
+                //e.HasMany(x => x.Items)
+                //    .WithOne()
+                //    .HasForeignKey("OrderId")
+                //    .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasMany(x => x.StatusHistory)
-                    .WithOne()
-                    .HasForeignKey("OrderId")
-                    .OnDelete(DeleteBehavior.Cascade);
+                //e.HasMany(x => x.StatusHistory)
+                //    .WithOne()
+                //    .HasForeignKey("OrderId")
+                //    .OnDelete(DeleteBehavior.Cascade);
 
-                e.HasOne(x => x.Payment)
-                    .WithOne()
-                    .HasForeignKey<Payment>("OrderId")
-                    .OnDelete(DeleteBehavior.Cascade);
+                //e.HasOne(x => x.Payment)
+                //    .WithOne()
+                //    .HasForeignKey<Payment>("OrderId")
+                //    .OnDelete(DeleteBehavior.Cascade);
+
+                 e.Property(o => o.Version)
+                    .IsConcurrencyToken();
             });
 
             builder.Entity<OrderItems>(e =>
@@ -119,7 +125,7 @@ namespace MultiTenantManagement.Data
                     .OnDelete(DeleteBehavior.Cascade);
 
                 e.HasOne(x => x.Product)
-                    .WithMany()
+                    .WithMany(p => p.OrderItems)
                     .HasForeignKey(x => x.ProductId)
                     .OnDelete(DeleteBehavior.Restrict);
             });

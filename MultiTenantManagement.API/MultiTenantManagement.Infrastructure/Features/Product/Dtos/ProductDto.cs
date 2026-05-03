@@ -21,5 +21,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Product.Dtos
         public bool IsActive { get; set; }
         public DateTime CreatedAtUtc { get; set; }
 
+        public int Version { get; set; }
+
     }
 }

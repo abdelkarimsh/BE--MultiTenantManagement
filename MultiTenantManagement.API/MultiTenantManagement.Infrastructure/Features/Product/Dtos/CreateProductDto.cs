@@ -31,5 +31,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Product.Dtos
 
         public bool IsActive { get; set; } = true;
 
+        public int Version { get; set; } = 1;
+
     }
 }

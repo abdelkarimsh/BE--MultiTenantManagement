@@ -1,10 +1,6 @@
 ﻿using MultiTenantManagement.Infrastructure.Features.Product.Dtos;
 using MultiTenantManagement.Infrastructure.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace MultiTenantManagement.Infrastructure.Features.Product
 {
@@ -15,11 +11,16 @@ namespace MultiTenantManagement.Infrastructure.Features.Product
         int pageSize,
         string? sortBy,
         bool isAscending,
-        string? search);
+        string? search,
+        CancellationToken ct = default);
 
-        Task<ProductDto?> GetByIdAsync(Guid tenantId, Guid id);
-        Task<ProductDto> CreateAsync(Guid tenantId, CreateProductDto dto);
-        Task<bool> UpdateAsync(Guid tenantId, Guid id, UpdateProductDto dto);
-        Task<bool> DeleteAsync(Guid tenantId ,Guid id);
+        Task<ProductDto?> GetByIdAsync(Guid tenantId, Guid id,
+        CancellationToken ct = default);
+        Task<ProductDto> CreateAsync(Guid tenantId, CreateProductDto dto,
+        CancellationToken ct = default);
+        Task<bool> UpdateAsync(Guid tenantId, Guid id, UpdateProductDto dto,
+        CancellationToken ct = default);
+        Task<bool> DeleteAsync(Guid tenantId ,Guid id, int version,
+        CancellationToken ct = default);
     }
 }

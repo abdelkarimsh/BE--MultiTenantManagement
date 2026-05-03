@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantManagement.Data.Models;
@@ -78,9 +79,9 @@ namespace MultiTenantManagement.API.Controllers
         // DELETE: api/products/{id}
         [Authorize(Roles = "TenantAdmin")]
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid tenantId,Guid id)
+        public async Task<IActionResult> Delete(Guid tenantId,Guid id,int version, CancellationToken ct = default)
         {
-            var success = await _productService.DeleteAsync(tenantId,id);
+            var success = await _productService.DeleteAsync(tenantId,id, version, ct);
             if (!success)
                 return NotFound();
 

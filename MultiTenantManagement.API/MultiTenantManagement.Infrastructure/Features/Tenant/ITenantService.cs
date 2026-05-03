@@ -23,8 +23,7 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
         Task<TenantDto> CreateAsync(CreateTenantRequestDto req, CancellationToken ct);
         Task<bool> UpdateAsync(UpdateTenantRequestDto req, CancellationToken ct);
         Task<bool> DeleteAsync(Guid id, CancellationToken ct);
-        bool HasTenantAccessForCurrentUser(Guid routeTenantId);
-
+        Task<bool> HasTenantAccessForCurrentUserAsync(Guid routeTenantId,CancellationToken ct = default);
         Task<TenantDto?> GetUserTenantAsync(CancellationToken ct);
 
     }
