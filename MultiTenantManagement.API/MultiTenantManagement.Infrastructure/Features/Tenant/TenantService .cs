@@ -155,6 +155,33 @@ namespace MultiTenantManagement.Infrastructure.Features.Tenant
             return true;
         }
 
+        public async Task<List<TenantDropdownDto>> GetDropdownAsync(string? searchTerm, int maxResults, CancellationToken ct)
+        {
+            if (maxResults <= 0 || maxResults > 10)
+                maxResults = 10;
+
+            var trimmedSearch = searchTerm?.Trim();
+
+            IQueryable<Data.Models.Tenant> query = _db.Tenants
+                .AsNoTracking()
+                .Where(t => !t.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(trimmedSearch))
+            {
+                query = query.Where(t => EF.Functions.ILike(t.Name, $"%{trimmedSearch}%"));
+            }
+
+            return await query
+                .OrderBy(t => t.Name)
+                .Select(t => new TenantDropdownDto
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                })
+                .Take(maxResults)
+                .ToListAsync(ct);
+        }
+
         public async Task<TenantDto?> GetUserTenantAsync(CancellationToken ct)
         {
             var user = _httpContextAccessor.HttpContext?.User;

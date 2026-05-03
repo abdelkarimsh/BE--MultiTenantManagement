@@ -19,6 +19,17 @@ namespace MultiTenantManagement.API.Controllers
         public TenantsController(ITenantService tenantService)
             => _tenantService = tenantService;
 
+        [Authorize(Roles = "SystemAdmin")]
+        [HttpGet("dropdown")]
+        public async Task<ActionResult<List<TenantDropdownDto>>> GetDropdown(
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] int maxResults = 10,
+            CancellationToken ct = default)
+        {
+            var tenants = await _tenantService.GetDropdownAsync(searchTerm, maxResults, ct);
+            return Ok(tenants);
+        }
+
         [Authorize(Policy = "SuperAdminOnly")]
         [HttpGet]
         [Route("GetTenants")]
