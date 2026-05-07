@@ -46,7 +46,7 @@ public class OrderDto
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
     public Guid CustomerId { get; set; }
-    public string? CustomerName { get; set; }
+    public string CustomerName { get; set; } = "Unknown";
     public string DeliveryAddress { get; set; } = string.Empty;
     public string Status { get; set; }
     public decimal TotalAmount { get; set; }
@@ -80,6 +80,7 @@ public class OrderListItemDto
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
     public Guid CustomerId { get; set; }
+    public string CustomerName { get; set; } = "Unknown";
     public string DeliveryAddress { get; set; } = string.Empty;
     public string Status { get; set; }
     public decimal TotalAmount { get; set; }

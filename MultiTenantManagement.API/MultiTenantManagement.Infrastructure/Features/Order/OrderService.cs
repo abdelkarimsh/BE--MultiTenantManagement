@@ -137,12 +137,19 @@ public class OrderService : IOrderService
             query = query.Where(x => x.CustomerId == currentUserId);
         }
 
-        var order = await query
-            .Select(x => new OrderDto
+        var order = await (
+            from x in query
+            join customer in _dbContext.Users.AsNoTracking().Where(u => !u.IsDeleted)
+                on x.CustomerId.ToString() equals customer.Id into customers
+            from customer in customers.DefaultIfEmpty()
+            select new OrderDto
             {
                 Id = x.Id,
                 TenantId = x.TenantId,
                 CustomerId = x.CustomerId,
+                CustomerName = customer != null && customer.Email != null
+                    ? customer.Email
+                    : "Unknown",
                 DeliveryAddress = x.DeliveryAddress,
                 Status = x.Status,
                 TotalAmount = x.TotalAmount,
@@ -240,19 +247,29 @@ public class OrderService : IOrderService
 
         var totalCount = await query.CountAsync(ct);
 
-        var items = await query
+        var pagedQuery = query
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .Select(x => new OrderListItemDto
+            .Take(pageSize);
+
+        var items = await (
+            from x in pagedQuery
+            join customer in _dbContext.Users.AsNoTracking().Where(u => !u.IsDeleted)
+                on x.CustomerId.ToString() equals customer.Id into customers
+            from customer in customers.DefaultIfEmpty()
+            select new OrderListItemDto
             {
                 Id = x.Id,
                 TenantId = x.TenantId,
                 CustomerId = x.CustomerId,
+                CustomerName = customer != null && customer.Email != null
+                    ? customer.Email
+                    : "Unknown",
                 DeliveryAddress = x.DeliveryAddress,
                 Status = x.Status,
                 TotalAmount = x.TotalAmount,
                 CreatedAtUtc = x.CreatedAtUtc,
-                UpdatedAtUtc = x.UpdatedAtUtc
+                UpdatedAtUtc = x.UpdatedAtUtc,
+                Version = x.Version
             })
             .ToListAsync(ct);
 

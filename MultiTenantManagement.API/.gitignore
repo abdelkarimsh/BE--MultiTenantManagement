@@ -1,0 +1,46 @@
+	# Build folders
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider / VSCode
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Secrets
+secrets.json
+
+# Node
+node_modules/
+
+# Coverage
+coverage/
+TestResults/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-data/
+
+# Publish
+publish/
+
+# NuGet
+*.nupkg
+
+# Temp
+tmp/
+temp/

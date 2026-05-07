@@ -1,0 +1,18 @@
+services:
+  api:
+    image: multitenant-api
+    container_name: multitenant-api-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__Default: "${DB_CONNECTION}"
+      Jwt__Key: "${JWT_KEY}"
+      Jwt__Issuer: "MultiTenantManagement"
+      Jwt__Audience: "MultiTenantManagement"
+      Seed__SystemAdmin__Email: "${SEED_ADMIN_EMAIL}"
+      Seed__SystemAdmin__Password: "${SEED_ADMIN_PASSWORD}"
+    restart: unless-stopped

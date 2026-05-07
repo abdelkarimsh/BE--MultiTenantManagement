@@ -171,14 +171,17 @@ var app = builder.Build();
 
 await SeedData.SeedAsync(app.Services);
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
-app.UseHttpsRedirection();
-app.UseRouting();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+//app.UseHttpsRedirection();
+app.UseRouting();   
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
