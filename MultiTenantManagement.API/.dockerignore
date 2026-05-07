@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+.vs/
+.git/
+.gitignore
+
+**/*.user
+**/*.suo
+**/*.cache
+
+.env
+.env.*
+
+TestResults/
+coverage/
+
+MultiTenantManagement.API/wwwroot/uploads/

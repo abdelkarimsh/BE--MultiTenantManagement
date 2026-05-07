@@ -3,15 +3,12 @@ WORKDIR /src
 
 COPY . .
 
-RUN ls -la
-RUN ls -la MultiTenantManagement.API
-RUN ls -la MultiTenantManagement.API/MultiTenantManagement.API
+RUN dotnet restore MultiTenantManagement.API/MultiTenantManagement.API/MultiTenantManagement.API.csproj
 
-RUN dotnet restore MultiTenantManagement.API/MultiTenantManagement.API.csproj
-
-RUN dotnet publish MultiTenantManagement.API/MultiTenantManagement.API.csproj \
+RUN dotnet publish MultiTenantManagement.API/MultiTenantManagement.API/MultiTenantManagement.API.csproj \
     -c Release \
-    -o /app/publish
+    -o /app/publish \
+    --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
